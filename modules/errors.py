@@ -1,0 +1,2 @@
+class InvokeApiExeption(Exception):
+    pass
