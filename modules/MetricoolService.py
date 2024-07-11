@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 import requests
 from urllib.parse import urlencode
 from config import BASE_URL, auth, headers
-from modules.errors import InvokeApiExeption
+from modules.errors import InvokeApiException, ResponseApiException
 
 class Login(BaseModel):
     user_id: str = Field(alias='userId')
@@ -24,9 +24,11 @@ class MetricoolService(BaseModel):
         url = self.base_url+endpoint+f'?{encoded_params}'
 
         print(f"Request URL: {self.base_url+endpoint}")
-
-        result = requests.get(url=url, params=encoded_params, headers=self.request.headers)
-
+        try:
+            result = requests.get(url=url, params=encoded_params, headers=self.request.headers)
+        except Exception as e:
+            raise InvokeApiException(f"Error in the calling: {e}")
+        
         if result.status_code == 200:
             return result.json()
         else:
@@ -34,9 +36,7 @@ class MetricoolService(BaseModel):
                 "status_code": result.status_code,
                 "error": result.text
             }
-            raise InvokeApiExeption(error)
-
-
+            raise ResponseApiException(error)
 
 
 creds = {Login.__fields__[k].alias: v for k, v in auth.items()}

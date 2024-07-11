@@ -1,2 +1,6 @@
-class InvokeApiExeption(Exception):
+class InvokeApiException(Exception):
+    pass
+
+
+class ResponseApiException(Exception):
     pass
